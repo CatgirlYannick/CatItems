@@ -24,6 +24,8 @@ import java.util.logging.Level;
 public final class ItemRegistry {
     private final JavaPlugin plugin;
     private final Map<String, CatItemDefinition> definitions = new LinkedHashMap<>();
+    private Map<String, CatItemDefinition> localDefinitions = Map.of();
+    private List<CatItemDefinition> definitionSnapshot = List.of();
     private final File modelDataFile;
     private YamlConfiguration modelData;
 
@@ -40,12 +42,16 @@ public final class ItemRegistry {
         }
 
         definitions.clear();
+        localDefinitions = Map.of();
+        definitionSnapshot = List.of();
         modelData = YamlConfiguration.loadConfiguration(modelDataFile);
         int nextModelData = Math.max(plugin.getConfig().getInt("items.model-data-start", 10000),
                 modelData.getInt("next", 10000));
 
         File[] files = itemDirectory.listFiles((directory, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
         if (files == null) {
+            localDefinitions = Map.of();
+            definitionSnapshot = List.of();
             return 0;
         }
         List<File> sortedFiles = new ArrayList<>(List.of(files));
@@ -122,6 +128,7 @@ public final class ItemRegistry {
 
         modelData.set("next", nextModelData);
         saveModelData();
+        rebuildIndexes();
         return definitions.size();
     }
 
@@ -135,18 +142,30 @@ public final class ItemRegistry {
             return Optional.of(exact);
         }
         if (!normalized.contains(":")) {
-            List<CatItemDefinition> matches = definitions.values().stream()
-                    .filter(definition -> definition.id().getKey().equals(normalized))
-                    .toList();
-            if (matches.size() == 1) {
-                return Optional.of(matches.getFirst());
-            }
+            return Optional.ofNullable(localDefinitions.get(normalized));
         }
         return Optional.empty();
     }
 
     public Collection<CatItemDefinition> definitions() {
-        return List.copyOf(definitions.values());
+        return definitionSnapshot;
+    }
+
+    private void rebuildIndexes() {
+        Map<String, CatItemDefinition> uniqueLocalIds = new LinkedHashMap<>();
+        Set<String> ambiguousLocalIds = new TreeSet<>();
+        for (CatItemDefinition definition : definitions.values()) {
+            String localId = definition.id().getKey();
+            if (ambiguousLocalIds.contains(localId)) {
+                continue;
+            }
+            if (uniqueLocalIds.putIfAbsent(localId, definition) != null) {
+                uniqueLocalIds.remove(localId);
+                ambiguousLocalIds.add(localId);
+            }
+        }
+        localDefinitions = Map.copyOf(uniqueLocalIds);
+        definitionSnapshot = List.copyOf(definitions.values());
     }
 
     private NamespacedKey requireKey(String value, String field) {

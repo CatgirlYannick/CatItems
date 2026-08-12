@@ -16,10 +16,14 @@ public interface CatItemsApi {
 
     Optional<String> identify(ItemStack itemStack);
 
-    /** Plays a reusable first- and third-person use animation without consuming the held item. */
-    boolean playUseAnimation(Player player, String preset, int durationTicks);
+    /** Plays a named YAML keyframe animation without consuming the held item. */
+    boolean playUseAnimation(Player player, String animationId, int durationTicks);
 
     void stopUseAnimation(Player player);
+
+    Collection<String> animations();
+
+    Optional<Integer> animationDuration(String id);
 
     Collection<CatFeature> features();
 

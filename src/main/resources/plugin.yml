@@ -1,5 +1,5 @@
 name: CatItems
-version: '0.3.0-ALPHA'
+version: '0.7.0-ALPHA'
 main: dev.catgirlyannick.catitems.CatItemsPlugin
 api-version: '1.21'
 author: CatgirlYannick
@@ -21,6 +21,7 @@ permissions:
       catitems.give: true
       catitems.reload: true
       catitems.pack: true
+      catitems.animation: true
   catitems.give:
     description: Give custom items
     default: op
@@ -29,4 +30,7 @@ permissions:
     default: op
   catitems.pack:
     description: Build and distribute the resource pack
+    default: op
+  catitems.animation:
+    description: Preview custom CatItems keyframe animations
     default: op

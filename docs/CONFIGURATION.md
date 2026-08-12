@@ -23,6 +23,16 @@ Minecraft 1.21.4+ uses item-model definitions. Minecraft 1.21 through 1.21.3
 uses base-material model overrides with `custom_model_data`. CatItems always
 builds the pack metadata for the running server version.
 
+## Custom Animations
+
+`plugins/CatItems/animations.yml` contains editable arm-emote keyframes. A
+reload validates real held-item arm poses, optional body poses and torso yaw,
+movement locking, particles, sounds, and regenerated item-animation models.
+CatItems never forces the player's head or camera direction.
+Bundled animations use staged approach/contact/release models to reduce visible
+endpoint snapping while a native arm pose remains active.
+See [ANIMATIONS.md](ANIMATIONS.md) for all available fields and poses.
+
 ## Future Feature Flags
 
 The `features` section contains deliberately disabled foundation flags for

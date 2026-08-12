@@ -17,7 +17,7 @@ features:
 animations:
   enabled: true
   min-duration-ticks: 12
-  max-duration-ticks: 100
+  max-duration-ticks: 120
 
 resource-pack:
   build-on-start: true

@@ -1,6 +1,7 @@
 package dev.catgirlyannick.catitems.pack;
 
 import dev.catgirlyannick.catitems.api.CatItemDefinition;
+import dev.catgirlyannick.catitems.animation.AnimationModelPose;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -52,6 +53,7 @@ public final class ResourcePackBuilder {
             writeGeneratedModel(generatedDirectory, definition);
             if (modernItemModels) {
                 writeModernItemDefinition(generatedDirectory, definition);
+                writeAnimationModels(generatedDirectory, definition);
             } else {
                 byMaterial.computeIfAbsent(definition.material(), ignored -> new ArrayList<>()).add(definition);
             }
@@ -145,6 +147,27 @@ public final class ResourcePackBuilder {
                 }
                 """.formatted(definition.itemModel());
         Files.writeString(itemFile, json, StandardCharsets.UTF_8);
+    }
+
+    private void writeAnimationModels(Path root, CatItemDefinition definition) throws IOException {
+        for (AnimationModelPose pose : AnimationModelPose.generated()) {
+            var animatedKey = pose.itemModelKey(definition.itemModel());
+            Path modelFile = assetPath(root, animatedKey.getNamespace(), "models", animatedKey.getKey() + ".json");
+            Files.createDirectories(modelFile.getParent());
+            Files.writeString(modelFile, pose.modelJson(definition.itemModel()), StandardCharsets.UTF_8);
+
+            Path itemFile = assetPath(root, animatedKey.getNamespace(), "items", animatedKey.getKey() + ".json");
+            Files.createDirectories(itemFile.getParent());
+            String itemJson = """
+                    {
+                      "model": {
+                        "type": "minecraft:model",
+                        "model": "%s"
+                      }
+                    }
+                    """.formatted(animatedKey);
+            Files.writeString(itemFile, itemJson, StandardCharsets.UTF_8);
+        }
     }
 
     private void writeLegacyOverrides(Path root, Map<Material, List<CatItemDefinition>> byMaterial) throws IOException {

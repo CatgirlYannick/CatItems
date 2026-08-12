@@ -2,6 +2,7 @@ package dev.catgirlyannick.catitems;
 
 import dev.catgirlyannick.catitems.api.CatItemsApi;
 import dev.catgirlyannick.catitems.animation.UseAnimationService;
+import dev.catgirlyannick.catitems.animation.UseAnimationRegistry;
 import dev.catgirlyannick.catitems.command.CatItemsCommand;
 import dev.catgirlyannick.catitems.config.ItemRegistry;
 import dev.catgirlyannick.catitems.item.CatItemService;
@@ -12,14 +13,22 @@ import dev.catgirlyannick.catitems.pack.ResourcePackManager;
 import dev.catgirlyannick.catitems.service.MessageService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 
 public final class CatItemsPlugin extends JavaPlugin {
@@ -35,6 +44,7 @@ public final class CatItemsPlugin extends JavaPlugin {
     private MessageService messages;
     private ResourcePackManager packManager;
     private UseAnimationService animations;
+    private UseAnimationRegistry animationRegistry;
 
     @Override
     public void onEnable() {
@@ -52,7 +62,13 @@ public final class CatItemsPlugin extends JavaPlugin {
         messages = new MessageService(loadMessages());
         registry = new ItemRegistry(this);
         int loaded = registry.reload();
-        animations = new UseAnimationService(this);
+        animationRegistry = new UseAnimationRegistry(this);
+        int animationCount = animationRegistry.reload();
+        animations = new UseAnimationService(this, registry, animationRegistry);
+        if (!animations.supportsArmPoses()) {
+            getLogger().warning("Modern arm poses are unavailable on this Paper build; update to Minecraft 1.21.4 or newer.");
+        }
+        getServer().getPluginManager().registerEvents(animations, this);
         itemService = new CatItemService(this, registry, animations);
         packManager = new ResourcePackManager(this, messages);
 
@@ -74,7 +90,8 @@ public final class CatItemsPlugin extends JavaPlugin {
             }
         }
         getLogger().info("CatItems " + getPluginMeta().getVersion() + " is active: " + loaded
-                + " items, Minecraft " + Bukkit.getMinecraftVersion() + ", pack format " + format.display() + ".");
+                + " items, " + animationCount + " custom animations, Minecraft "
+                + Bukkit.getMinecraftVersion() + ", pack format " + format.display() + ".");
     }
 
     @Override
@@ -95,6 +112,9 @@ public final class CatItemsPlugin extends JavaPlugin {
         validateConfig();
         messages.reload(loadMessages());
         int loaded = registry.reload();
+        itemService.clearPrototypeCache();
+        animations.shutdown();
+        animationRegistry.reload();
         if (getConfig().getBoolean("resource-pack.build-on-start", true)) {
             try {
                 rebuildPack();
@@ -112,10 +132,64 @@ public final class CatItemsPlugin extends JavaPlugin {
     private void saveBundledFiles() {
         saveDefaultConfig();
         saveIfMissing("messages.yml");
+        saveIfMissing("animations.yml");
+        upgradeBundledAnimations();
         saveIfMissing("items/starter.yml");
         saveIfMissing("pack/README.txt");
         for (String texture : STARTER_TEXTURES) {
             saveIfMissing(texture);
+        }
+    }
+
+    private void upgradeBundledAnimations() {
+        File target = new File(getDataFolder(), "animations.yml");
+        YamlConfiguration current = YamlConfiguration.loadConfiguration(target);
+        int previousVersion = current.getInt("config-version", 1);
+        if (previousVersion >= 5) {
+            return;
+        }
+        File backup = new File(getDataFolder(), "animations-v" + previousVersion + "-backup.yml");
+        try {
+            if (!backup.isFile()) {
+                Files.copy(target.toPath(), backup.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            }
+            Map<String, Map<String, Object>> customAnimations = customAnimations(current);
+            saveResource("animations.yml", true);
+            if (!customAnimations.isEmpty()) {
+                YamlConfiguration upgraded = YamlConfiguration.loadConfiguration(target);
+                customAnimations.forEach((id, values) -> upgraded.set("animations." + id, values));
+                upgraded.save(target);
+            }
+            getLogger().info("Upgraded animations.yml to smooth transition format; previous file saved as "
+                    + backup.getName() + " and " + customAnimations.size() + " custom animation(s) were preserved.");
+        } catch (IOException exception) {
+            throw new IllegalStateException("animations.yml could not be upgraded", exception);
+        }
+    }
+
+    private Map<String, Map<String, Object>> customAnimations(YamlConfiguration current) throws IOException {
+        try (InputStream input = getResource("animations.yml")) {
+            if (input == null) {
+                throw new IOException("Bundled animations.yml is unavailable");
+            }
+            YamlConfiguration bundled = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(input, StandardCharsets.UTF_8));
+            ConfigurationSection currentRoot = current.getConfigurationSection("animations");
+            ConfigurationSection bundledRoot = bundled.getConfigurationSection("animations");
+            Map<String, Map<String, Object>> custom = new LinkedHashMap<>();
+            if (currentRoot == null || bundledRoot == null) {
+                return custom;
+            }
+            for (String id : currentRoot.getKeys(false)) {
+                if (bundledRoot.contains(id)) {
+                    continue;
+                }
+                ConfigurationSection section = currentRoot.getConfigurationSection(id);
+                if (section != null) {
+                    custom.put(id, new LinkedHashMap<>(section.getValues(false)));
+                }
+            }
+            return custom;
         }
     }
 

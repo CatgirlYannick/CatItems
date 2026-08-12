@@ -19,7 +19,8 @@ version-correct pack, and exposes a public Bukkit service API for other plugins.
 - automatic join delivery and status diagnostics
 - MiniMessage/RGB item names and lore rendered in Small Caps without replacing `ä`, `ö`, `ü` or `ß`
 - public Bukkit service API and a queryable feature catalog
-- reusable use animations with hand movement, particles, and synchronized sounds
+- editable YAML arm emotes with staged approach, contact, use, and release
+  transitions plus real eating, drinking, smoking, aiming, and two-handed poses
 - four ready-to-use starter items with compact 3D models
 
 ## Requirements
@@ -32,7 +33,7 @@ ItemsAdder, Oraxen, Nexo, and CatDrugs are not required.
 
 ## Installation
 
-1. Place `CatItems-0.3.0-ALPHA.jar` in the server's `plugins/` directory.
+1. Place `CatItems-0.7.0-ALPHA.jar` in the server's `plugins/` directory.
 2. Start Paper once.
 3. Configure a public resource-pack URL or intentionally enable self-hosting.
 4. Add item YAML files under `plugins/CatItems/items/` and pack assets under
@@ -46,6 +47,7 @@ ItemsAdder, Oraxen, Nexo, and CatDrugs are not required.
 - [Configuration](docs/CONFIGURATION.md)
 - [Commands and permissions](docs/COMMANDS.md)
 - [Public API](docs/API.md)
+- [Custom animations](docs/ANIMATIONS.md)
 - [Feature parity map](docs/ITEMSADDER_PARITY.md)
 - [Download description](docs/DOWNLOAD_DESCRIPTION.md)
 - [Changelog](CHANGELOG.md)

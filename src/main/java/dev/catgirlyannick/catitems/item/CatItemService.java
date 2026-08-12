@@ -18,6 +18,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public final class CatItemService implements CatItemsApi {
@@ -26,6 +28,7 @@ public final class CatItemService implements CatItemsApi {
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final Method setItemModel;
     private final UseAnimationService animations;
+    private final Map<String, ItemStack> prototypes = new HashMap<>();
 
     public CatItemService(JavaPlugin plugin, ItemRegistry registry, UseAnimationService animations) {
         this.registry = registry;
@@ -52,7 +55,14 @@ public final class CatItemService implements CatItemsApi {
             throw new IllegalArgumentException("The amount must be between 1 and "
                     + definition.material().getMaxStackSize());
         }
-        ItemStack itemStack = new ItemStack(definition.material(), amount);
+        ItemStack itemStack = prototypes.computeIfAbsent(definition.id().toString(), ignored -> createPrototype(definition))
+                .clone();
+        itemStack.setAmount(amount);
+        return itemStack;
+    }
+
+    private ItemStack createPrototype(CatItemDefinition definition) {
+        ItemStack itemStack = new ItemStack(definition.material());
         ItemMeta meta = itemStack.getItemMeta();
         meta.displayName(miniMessage.deserialize(SmallCapsFormatter.formatTemplate(definition.displayName()))
                 .decoration(TextDecoration.ITALIC, false));
@@ -71,6 +81,10 @@ public final class CatItemService implements CatItemsApi {
         return itemStack;
     }
 
+    public void clearPrototypeCache() {
+        prototypes.clear();
+    }
+
     @Override
     public Optional<String> identify(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
@@ -81,13 +95,23 @@ public final class CatItemService implements CatItemsApi {
     }
 
     @Override
-    public boolean playUseAnimation(org.bukkit.entity.Player player, String preset, int durationTicks) {
-        return animations.play(player, preset, durationTicks);
+    public boolean playUseAnimation(org.bukkit.entity.Player player, String animationId, int durationTicks) {
+        return animations.play(player, animationId, durationTicks);
     }
 
     @Override
     public void stopUseAnimation(org.bukkit.entity.Player player) {
         animations.stop(player);
+    }
+
+    @Override
+    public Collection<String> animations() {
+        return animations.animationIds();
+    }
+
+    @Override
+    public Optional<Integer> animationDuration(String id) {
+        return animations.duration(id);
     }
 
     @Override

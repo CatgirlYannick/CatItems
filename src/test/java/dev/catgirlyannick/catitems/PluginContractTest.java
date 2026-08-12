@@ -20,7 +20,7 @@ class PluginContractTest {
     void pluginManifestDeclaresStandaloneEntryPoint() throws IOException {
         String manifest = resourceText("plugin.yml");
         assertTrue(manifest.contains("name: CatItems"));
-        assertTrue(manifest.contains("version: '0.3.0-ALPHA'"));
+        assertTrue(manifest.contains("version: '0.7.0-ALPHA'"));
         assertTrue(manifest.contains("main: dev.catgirlyannick.catitems.CatItemsPlugin"));
         assertTrue(manifest.contains("api-version: '1.21'"));
         assertTrue(manifest.contains("catitems.admin:"));
@@ -47,7 +47,15 @@ class PluginContractTest {
         assertTrue(config.contains("furniture: false"));
         assertTrue(config.contains("worldgen: false"));
         assertTrue(config.contains("animations:"));
-        assertTrue(config.contains("max-duration-ticks: 100"));
+        assertTrue(config.contains("max-duration-ticks: 120"));
+        assertTrue(resourceText("animations.yml").contains("item-pose: mouth"));
+        assertTrue(resourceText("animations.yml").contains("item-pose: approach"));
+        assertTrue(resourceText("animations.yml").contains("item-pose: contact"));
+        assertTrue(resourceText("animations.yml").contains("item-pose: release"));
+        assertTrue(resourceText("animations.yml").contains("arm-pose: drink"));
+        assertTrue(resourceText("animations.yml").contains("arm-pose: face"));
+        assertTrue(!resourceText("animations.yml").contains("head-yaw"));
+        assertTrue(!resourceText("animations.yml").contains("head-pitch"));
     }
 
     @Test

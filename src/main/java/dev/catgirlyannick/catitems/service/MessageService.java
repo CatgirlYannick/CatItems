@@ -5,10 +5,12 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public final class MessageService {
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private final Map<String, Component> staticComponents = new HashMap<>();
     private YamlConfiguration messages;
 
     public MessageService(YamlConfiguration messages) {
@@ -17,6 +19,7 @@ public final class MessageService {
 
     public void reload(YamlConfiguration messages) {
         this.messages = messages;
+        staticComponents.clear();
     }
 
     public void send(CommandSender sender, String path) {
@@ -28,6 +31,17 @@ public final class MessageService {
     }
 
     public Component component(String path, Map<String, String> placeholders) {
+        if (placeholders.isEmpty()) {
+            return staticComponents.computeIfAbsent(path, this::staticComponent);
+        }
+        return render(path, placeholders);
+    }
+
+    private Component staticComponent(String path) {
+        return render(path, Map.of());
+    }
+
+    private Component render(String path, Map<String, String> placeholders) {
         String prefix = messages.getString("prefix", "<dark_gray>[<aqua>CatItems</aqua>]</dark_gray> ");
         String value = messages.getString(path, "<red>Fehlender Text: " + path + "</red>");
         String formatted = SmallCapsFormatter.formatTemplate(prefix + value);

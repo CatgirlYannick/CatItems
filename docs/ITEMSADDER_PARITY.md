@@ -15,7 +15,9 @@ The same catalog is available through `/catitems features` and the public API.
 - automatic join delivery
 - MiniMessage/RGB names and lore
 - glint override, starter assets, service API, and administration commands
-- reusable use animations with eight sound-and-particle presets
+- editable player-emote timelines with real Vanilla arm-use poses, optional
+  body poses, movement locking, ten custom 3D item poses, sounds, and particles;
+  head and camera direction remain player-controlled
 
 ## Foundation
 

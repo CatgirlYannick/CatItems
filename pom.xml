@@ -6,7 +6,7 @@
 
     <groupId>dev.catgirlyannick</groupId>
     <artifactId>catitems</artifactId>
-    <version>0.3.0-ALPHA</version>
+    <version>0.7.0-ALPHA</version>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>

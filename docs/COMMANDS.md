@@ -10,6 +10,8 @@
 | `/catitems pack build` | `catitems.pack` | Build the pack immediately |
 | `/catitems pack send [player]` | `catitems.pack` | Send the pack |
 | `/catitems features [live\|foundation\|planned]` | `catitems.use` | Browse the feature catalog |
+| `/catitems animations list` | `catitems.use` | List registered keyframe animations |
+| `/catitems animations play <player> <id> [duration]` | `catitems.animation` | Preview an animation |
 | `/catitems status` | `catitems.pack` | Show version, pack format, hash, and URL |
 
 `catitems.admin` grants every administrative child permission and defaults to

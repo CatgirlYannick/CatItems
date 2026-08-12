@@ -52,6 +52,7 @@ public final class CatItemsCommand implements CommandExecutor, TabCompleter {
                 case "pack" -> pack(sender, args);
                 case "status" -> status(sender);
                 case "features", "parity" -> features(sender, args);
+                case "animations", "animation" -> animations(sender, args);
                 default -> help(sender);
             };
         } catch (RuntimeException exception) {
@@ -67,6 +68,7 @@ public final class CatItemsCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(messages.raw("<white>/catitems list</white> <gray>- registered items</gray>"));
         sender.sendMessage(messages.raw("<white>/catitems info <id></white> <gray>- item details</gray>"));
         sender.sendMessage(messages.raw("<white>/catitems features [live|foundation|planned]</white> <gray>- ItemsAdder parity map</gray>"));
+        sender.sendMessage(messages.raw("<white>/catitems animations [play <player> <id>]</white> <gray>- custom keyframe animations</gray>"));
         if (sender.hasPermission("catitems.give")) {
             sender.sendMessage(messages.raw("<white>/catitems give <player> <id> [amount]</white>"));
         }
@@ -246,6 +248,49 @@ public final class CatItemsCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean animations(CommandSender sender, String[] args) {
+        if (args.length == 1 || "list".equalsIgnoreCase(args[1])) {
+            sender.sendMessage(messages.raw("<aqua>Registered custom animations (" + items.animations().size() + "):</aqua>"));
+            for (String id : items.animations()) {
+                sender.sendMessage(messages.raw("<gray>•</gray> <white>" + id + "</white> <dark_gray>("
+                        + items.animationDuration(id).orElse(0) + " ticks)</dark_gray>"));
+            }
+            return true;
+        }
+        if (!"play".equalsIgnoreCase(args[1]) || args.length < 4) {
+            sender.sendMessage(messages.raw("<red>Usage: /catitems animations [list|play <player> <id> [duration]]</red>"));
+            return true;
+        }
+        if (!require(sender, "catitems.animation")) {
+            return true;
+        }
+        Player target = Bukkit.getPlayerExact(args[2]);
+        if (target == null) {
+            messages.send(sender, "player-not-found", Map.of("player", args[2]));
+            return true;
+        }
+        int duration = items.animationDuration(args[3]).orElse(-1);
+        if (duration < 0) {
+            sender.sendMessage(messages.raw("<red>Unknown animation: <white>" + args[3] + "</white></red>"));
+            return true;
+        }
+        if (args.length >= 5) {
+            try {
+                duration = Integer.parseInt(args[4]);
+            } catch (NumberFormatException exception) {
+                messages.send(sender, "invalid-number");
+                return true;
+            }
+        }
+        if (!items.playUseAnimation(target, args[3], duration)) {
+            sender.sendMessage(messages.raw("<red>The animation could not be started.</red>"));
+            return true;
+        }
+        sender.sendMessage(messages.raw("<green>Playing <white>" + args[3] + "</white> for <white>"
+                + target.getName() + "</white>.</green>"));
+        return true;
+    }
+
     private boolean require(CommandSender sender, String permission) {
         if (sender.hasPermission(permission)) {
             return true;
@@ -258,7 +303,7 @@ public final class CatItemsCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
-            suggestions.addAll(List.of("help", "list", "info", "features", "parity"));
+            suggestions.addAll(List.of("help", "list", "info", "features", "parity", "animations"));
             if (sender.hasPermission("catitems.give")) suggestions.add("give");
             if (sender.hasPermission("catitems.reload")) suggestions.add("reload");
             if (sender.hasPermission("catitems.pack")) suggestions.addAll(List.of("pack", "status"));
@@ -274,6 +319,14 @@ public final class CatItemsCommand implements CommandExecutor, TabCompleter {
             Bukkit.getOnlinePlayers().forEach(player -> suggestions.add(player.getName()));
         } else if (args.length == 2 && ("features".equalsIgnoreCase(args[0]) || "parity".equalsIgnoreCase(args[0]))) {
             suggestions.addAll(List.of("live", "foundation", "planned"));
+        } else if (args.length == 2 && ("animations".equalsIgnoreCase(args[0]) || "animation".equalsIgnoreCase(args[0]))) {
+            suggestions.addAll(List.of("list", "play"));
+        } else if (args.length == 3 && "play".equalsIgnoreCase(args[1])
+                && ("animations".equalsIgnoreCase(args[0]) || "animation".equalsIgnoreCase(args[0]))) {
+            Bukkit.getOnlinePlayers().forEach(player -> suggestions.add(player.getName()));
+        } else if (args.length == 4 && "play".equalsIgnoreCase(args[1])
+                && ("animations".equalsIgnoreCase(args[0]) || "animation".equalsIgnoreCase(args[0]))) {
+            suggestions.addAll(items.animations());
         }
         String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
         return suggestions.stream().filter(value -> value.toLowerCase(Locale.ROOT).startsWith(prefix)).sorted().toList();
