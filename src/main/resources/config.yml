@@ -1,0 +1,33 @@
+config-version: 1
+
+items:
+  model-data-start: 10000
+
+features:
+  custom-blocks: false
+  furniture: false
+  custom-entities: false
+  custom-recipes: false
+  custom-sounds: false
+  font-images: false
+  huds: false
+  worldgen: false
+
+resource-pack:
+  build-on-start: true
+  send-on-join: true
+  join-delay-ticks: 30
+  required: false
+  prompt: '<gold>CatItems requires its resource pack for custom textures.</gold>'
+  # disabled, self-host, or external
+  delivery: self-host
+  external-url: ''
+  self-host:
+    bind-address: '0.0.0.0'
+    port: 8164
+    path: '/catitems-pack.zip'
+    # On a public server, change this to an address reachable by players.
+    public-url: 'http://127.0.0.1:8164/catitems-pack.zip'
+
+logging:
+  pack-status: true

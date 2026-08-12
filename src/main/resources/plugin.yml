@@ -1,0 +1,32 @@
+name: CatItems
+version: '0.2.1-ALPHA'
+main: dev.catgirlyannick.catitems.CatItemsPlugin
+api-version: '1.21'
+author: CatgirlYannick
+description: Standalone custom-item and resource-pack engine for Paper 1.21 through 1.21.11.
+load: STARTUP
+commands:
+  catitems:
+    description: Manage and browse CatItems
+    usage: /catitems help
+    aliases: [ci, citems]
+permissions:
+  catitems.use:
+    description: Use public CatItems commands
+    default: true
+  catitems.admin:
+    description: Fully administer CatItems
+    default: op
+    children:
+      catitems.give: true
+      catitems.reload: true
+      catitems.pack: true
+  catitems.give:
+    description: Give custom items
+    default: op
+  catitems.reload:
+    description: Reload configuration and item registry
+    default: op
+  catitems.pack:
+    description: Build and distribute the resource pack
+    default: op

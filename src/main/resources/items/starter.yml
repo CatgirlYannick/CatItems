@@ -1,0 +1,40 @@
+config-version: 1
+namespace: catitems
+
+items:
+  ruby:
+    enabled: true
+    material: PAPER
+    display-name: '<red><bold>Ruby</bold></red>'
+    lore:
+      - '<gray>A sample item provided by CatItems.</gray>'
+    custom-model-data: auto
+    texture: 'catitems:item/ruby'
+    glint: false
+  sapphire:
+    enabled: true
+    material: PAPER
+    display-name: '<blue><bold>Sapphire</bold></blue>'
+    lore:
+      - '<gray>Loaded from items/starter.yml.</gray>'
+    custom-model-data: auto
+    texture: 'catitems:item/sapphire'
+    glint: false
+  emerald_gear:
+    enabled: true
+    material: IRON_NUGGET
+    display-name: '<green>Emerald Gear</green>'
+    lore:
+      - '<gray>Custom base materials are fully configurable.</gray>'
+    custom-model-data: auto
+    texture: 'catitems:item/emerald_gear'
+    glint: true
+  star_token:
+    enabled: true
+    material: GOLD_NUGGET
+    display-name: '<gold>Star Token</gold>'
+    lore:
+      - '<gray>A golden sample token.</gray>'
+    custom-model-data: auto
+    texture: 'catitems:item/star_token'
+    glint: false
