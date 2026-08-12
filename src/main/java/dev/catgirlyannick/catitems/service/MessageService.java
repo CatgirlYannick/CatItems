@@ -30,14 +30,16 @@ public final class MessageService {
     public Component component(String path, Map<String, String> placeholders) {
         String prefix = messages.getString("prefix", "<dark_gray>[<aqua>CatItems</aqua>]</dark_gray> ");
         String value = messages.getString(path, "<red>Fehlender Text: " + path + "</red>");
+        String formatted = SmallCapsFormatter.formatTemplate(prefix + value);
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            value = value.replace("{" + entry.getKey() + "}", escape(entry.getValue()));
+            formatted = formatted.replace("{" + entry.getKey() + "}",
+                    escape(SmallCapsFormatter.formatValue(entry.getValue())));
         }
-        return miniMessage.deserialize(prefix + value);
+        return miniMessage.deserialize(formatted);
     }
 
     public Component raw(String text) {
-        return miniMessage.deserialize(text);
+        return miniMessage.deserialize(SmallCapsFormatter.formatTemplate(text));
     }
 
     private String escape(String value) {

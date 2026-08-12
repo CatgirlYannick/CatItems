@@ -15,6 +15,7 @@ The same catalog is available through `/catitems features` and the public API.
 - automatic join delivery
 - MiniMessage/RGB names and lore
 - glint override, starter assets, service API, and administration commands
+- reusable use animations with eight sound-and-particle presets
 
 ## Foundation
 
@@ -24,7 +25,7 @@ The same catalog is available through `/catitems features` and the public API.
 
 ## Planned
 
-- custom blocks, furniture, entities, and animations
+- custom blocks, furniture, modeled entities, and entity animation assets
 - recipes, fuels, sounds, music discs, fonts, emojis, HUDs, and GUIs
 - armor geometry, hats, wings, consumables, durability, and projectiles
 - crops, loot, advancements, tags, liquids, vehicles, and world generation

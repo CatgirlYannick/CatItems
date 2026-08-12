@@ -2,9 +2,12 @@ package dev.catgirlyannick.catitems.item;
 
 import dev.catgirlyannick.catitems.api.CatItemDefinition;
 import dev.catgirlyannick.catitems.api.CatItemsApi;
+import dev.catgirlyannick.catitems.animation.UseAnimationService;
 import dev.catgirlyannick.catitems.config.ItemRegistry;
 import dev.catgirlyannick.catitems.feature.CatFeature;
 import dev.catgirlyannick.catitems.feature.FeatureCatalog;
+import dev.catgirlyannick.catitems.service.SmallCapsFormatter;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -22,9 +25,11 @@ public final class CatItemService implements CatItemsApi {
     private final NamespacedKey identityKey;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final Method setItemModel;
+    private final UseAnimationService animations;
 
-    public CatItemService(JavaPlugin plugin, ItemRegistry registry) {
+    public CatItemService(JavaPlugin plugin, ItemRegistry registry, UseAnimationService animations) {
         this.registry = registry;
+        this.animations = animations;
         this.identityKey = new NamespacedKey(plugin, "item_id");
         this.setItemModel = findSetItemModel();
     }
@@ -49,9 +54,14 @@ public final class CatItemService implements CatItemsApi {
         }
         ItemStack itemStack = new ItemStack(definition.material(), amount);
         ItemMeta meta = itemStack.getItemMeta();
-        meta.displayName(miniMessage.deserialize(definition.displayName()));
+        meta.displayName(miniMessage.deserialize(SmallCapsFormatter.formatTemplate(definition.displayName()))
+                .decoration(TextDecoration.ITALIC, false));
         if (!definition.lore().isEmpty()) {
-            meta.lore(definition.lore().stream().map(miniMessage::deserialize).toList());
+            meta.lore(definition.lore().stream()
+                    .map(SmallCapsFormatter::formatTemplate)
+                    .map(miniMessage::deserialize)
+                    .map(line -> line.decoration(TextDecoration.ITALIC, false))
+                    .toList());
         }
         meta.setCustomModelData(definition.customModelData());
         meta.getPersistentDataContainer().set(identityKey, PersistentDataType.STRING, definition.id().toString());
@@ -68,6 +78,16 @@ public final class CatItemService implements CatItemsApi {
         }
         String id = itemStack.getItemMeta().getPersistentDataContainer().get(identityKey, PersistentDataType.STRING);
         return id == null || registry.find(id).isEmpty() ? Optional.empty() : Optional.of(id);
+    }
+
+    @Override
+    public boolean playUseAnimation(org.bukkit.entity.Player player, String preset, int durationTicks) {
+        return animations.play(player, preset, durationTicks);
+    }
+
+    @Override
+    public void stopUseAnimation(org.bukkit.entity.Player player) {
+        animations.stop(player);
     }
 
     @Override

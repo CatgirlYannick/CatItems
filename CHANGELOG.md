@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0-ALPHA - 2026-08-12
+
+- Added a reusable public use-animation API.
+- Added smoke, snort, drink, eat, inhale, inject, ritual, and swallow presets.
+- Added first- and third-person hand motion, particles, and synchronized sounds.
+- Added duration limits and clean cancellation for active animations.
+
+## 0.2.2-ALPHA - 2026-08-12
+
+- Added central Small Caps rendering for messages, item names, and lore.
+- Preserved real `ä`, `ö`, `ü` and `ß` characters without ASCII replacements.
+- Disabled Vanilla italic styling on generated item names and lore.
+
 ## 0.2.1-ALPHA - 2026-08-12
 
 - Added a queryable feature catalog and ItemsAdder parity map.

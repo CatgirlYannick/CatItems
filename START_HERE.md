@@ -1,13 +1,13 @@
 # CatItems - Start Here
 
-Current release: `0.2.1-ALPHA` for Paper 1.21 through 1.21.11 and Java 21.
+Current release: `0.3.0-ALPHA` for Paper 1.21 through 1.21.11 and Java 21.
 
 CatItems is independent from ItemsAdder, Oraxen, Nexo, and CatDrugs. It provides
 the custom-item, model, and resource-pack foundation used by optional consumers.
 
 ## Quick Start
 
-1. Place `CatItems-0.2.1-ALPHA.jar` in `plugins/`.
+1. Place `CatItems-0.3.0-ALPHA.jar` in `plugins/`.
 2. Start the server with Java 21.
 3. Configure resource-pack delivery in `plugins/CatItems/config.yml`.
 4. Add YAML definitions under `plugins/CatItems/items/` and PNG assets under

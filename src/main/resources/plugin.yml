@@ -1,5 +1,5 @@
 name: CatItems
-version: '0.2.1-ALPHA'
+version: '0.3.0-ALPHA'
 main: dev.catgirlyannick.catitems.CatItemsPlugin
 api-version: '1.21'
 author: CatgirlYannick

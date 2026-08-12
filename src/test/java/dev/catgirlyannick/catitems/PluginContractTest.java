@@ -20,7 +20,7 @@ class PluginContractTest {
     void pluginManifestDeclaresStandaloneEntryPoint() throws IOException {
         String manifest = resourceText("plugin.yml");
         assertTrue(manifest.contains("name: CatItems"));
-        assertTrue(manifest.contains("version: '0.2.1-ALPHA'"));
+        assertTrue(manifest.contains("version: '0.3.0-ALPHA'"));
         assertTrue(manifest.contains("main: dev.catgirlyannick.catitems.CatItemsPlugin"));
         assertTrue(manifest.contains("api-version: '1.21'"));
         assertTrue(manifest.contains("catitems.admin:"));
@@ -33,6 +33,7 @@ class PluginContractTest {
         assertTrue(FeatureCatalog.find("custom-items").isPresent());
         assertTrue(FeatureCatalog.find("CUSTOM-BLOCKS").isPresent());
         assertTrue(FeatureCatalog.find("furniture").isPresent());
+        assertEquals(FeatureStatus.LIVE, FeatureCatalog.find("use-animations").orElseThrow().status());
         assertTrue(FeatureCatalog.count(FeatureStatus.LIVE) > 0);
         assertTrue(FeatureCatalog.count(FeatureStatus.FOUNDATION) > 0);
         assertTrue(FeatureCatalog.count(FeatureStatus.PLANNED) > 0);
@@ -45,6 +46,8 @@ class PluginContractTest {
         assertTrue(config.contains("custom-blocks: false"));
         assertTrue(config.contains("furniture: false"));
         assertTrue(config.contains("worldgen: false"));
+        assertTrue(config.contains("animations:"));
+        assertTrue(config.contains("max-duration-ticks: 100"));
     }
 
     @Test

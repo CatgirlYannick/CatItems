@@ -17,8 +17,9 @@ version-correct pack, and exposes a public Bukkit service API for other plugins.
 - deterministic ZIP build with SHA-1 calculation
 - external pack URL, optional built-in HTTP server, or disabled delivery
 - automatic join delivery and status diagnostics
-- MiniMessage/RGB item names and lore
+- MiniMessage/RGB item names and lore rendered in Small Caps without replacing `ä`, `ö`, `ü` or `ß`
 - public Bukkit service API and a queryable feature catalog
+- reusable use animations with hand movement, particles, and synchronized sounds
 - four ready-to-use starter items with compact 3D models
 
 ## Requirements
@@ -31,7 +32,7 @@ ItemsAdder, Oraxen, Nexo, and CatDrugs are not required.
 
 ## Installation
 
-1. Place `CatItems-0.2.1-ALPHA.jar` in the server's `plugins/` directory.
+1. Place `CatItems-0.3.0-ALPHA.jar` in the server's `plugins/` directory.
 2. Start Paper once.
 3. Configure a public resource-pack URL or intentionally enable self-hosting.
 4. Add item YAML files under `plugins/CatItems/items/` and pack assets under

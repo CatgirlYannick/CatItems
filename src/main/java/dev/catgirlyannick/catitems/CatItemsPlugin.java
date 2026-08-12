@@ -1,6 +1,7 @@
 package dev.catgirlyannick.catitems;
 
 import dev.catgirlyannick.catitems.api.CatItemsApi;
+import dev.catgirlyannick.catitems.animation.UseAnimationService;
 import dev.catgirlyannick.catitems.command.CatItemsCommand;
 import dev.catgirlyannick.catitems.config.ItemRegistry;
 import dev.catgirlyannick.catitems.item.CatItemService;
@@ -33,6 +34,7 @@ public final class CatItemsPlugin extends JavaPlugin {
     private CatItemService itemService;
     private MessageService messages;
     private ResourcePackManager packManager;
+    private UseAnimationService animations;
 
     @Override
     public void onEnable() {
@@ -50,7 +52,8 @@ public final class CatItemsPlugin extends JavaPlugin {
         messages = new MessageService(loadMessages());
         registry = new ItemRegistry(this);
         int loaded = registry.reload();
-        itemService = new CatItemService(this, registry);
+        animations = new UseAnimationService(this);
+        itemService = new CatItemService(this, registry, animations);
         packManager = new ResourcePackManager(this, messages);
 
         Bukkit.getServicesManager().register(CatItemsApi.class, itemService, this, ServicePriority.Normal);
@@ -81,6 +84,9 @@ public final class CatItemsPlugin extends JavaPlugin {
         }
         if (packManager != null) {
             packManager.stop();
+        }
+        if (animations != null) {
+            animations.shutdown();
         }
     }
 

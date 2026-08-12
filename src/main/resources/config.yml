@@ -13,6 +13,12 @@ features:
   huds: false
   worldgen: false
 
+# Reusable API animations for this plugin and optional addons such as CatDrugs.
+animations:
+  enabled: true
+  min-duration-ticks: 12
+  max-duration-ticks: 100
+
 resource-pack:
   build-on-start: true
   send-on-join: true
